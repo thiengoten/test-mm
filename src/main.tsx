@@ -17,8 +17,9 @@ export const queryClient = new QueryClient({
 // Create a new router instance
 const router = createRouter({
   routeTree,
-  defaultPreload: 'intent',
   context: { queryClient },
+  defaultPreload: 'intent',
+  defaultStaleTime: 0,
 })
 
 // Register the router instance for type safety

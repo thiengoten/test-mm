@@ -9,10 +9,10 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { supabase } from '@/lib/supabase'
+import { useLogin } from '@/queries/login'
+import { useSignUp } from '@/queries/signup'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate } from '@tanstack/react-router'
-import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 
@@ -24,8 +24,25 @@ type AuthFormData = z.infer<typeof loginSchema> | z.infer<typeof registerSchema>
 
 export function AuthForm({ type }: AuthFormProps) {
   const navigate = useNavigate()
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const {
+    onLogin,
+    isPending: isLoginPending,
+    error: loginError,
+  } = useLogin({
+    onSuccess: () => {
+      navigate({ to: '/dashboard/overview' })
+    },
+  })
+
+  const {
+    onSignUp,
+    isPending: isSignUpPending,
+    error: signUpError,
+  } = useSignUp({
+    onSuccess: () => {
+      navigate({ to: '/onboarding' })
+    },
+  })
 
   const schema = type === 'login' ? loginSchema : registerSchema
 
@@ -38,49 +55,15 @@ export function AuthForm({ type }: AuthFormProps) {
   })
 
   const onSubmit = async (data: AuthFormData) => {
-    setLoading(true)
-    setError(null)
-
-    try {
-      if (type === 'register') {
-        const { error } = await supabase.auth.signUp({
-          email: data.email,
-          password: data.password,
-        })
-
-        if (error) throw error
-
-        alert(
-          'Registration successful! Please check your email for verification.'
-        )
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email: data.email,
-          password: data.password,
-        })
-
-        if (error) throw error
-
-        navigate({ to: '/dashboard' })
-      }
-
-      console.log('Form submitted:', data)
-
-      if (type === 'login') {
-        navigate({ to: '/dashboard' })
-      } else {
-        alert(
-          'Registration successful! Please check your email for verification.'
-        )
-      }
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : 'An unexpected error occurred'
-      )
-    } finally {
-      setLoading(false)
+    if (type === 'login') {
+      onLogin(data)
+    } else {
+      onSignUp(data)
     }
   }
+
+  const error = type === 'login' ? loginError : signUpError
+  const isPending = type === 'login' ? isLoginPending : isSignUpPending
 
   return (
     <div className='w-full max-w-md space-y-6'>
@@ -97,7 +80,7 @@ export function AuthForm({ type }: AuthFormProps) {
 
       {error && (
         <div className='p-3 bg-red-100 border border-red-200 rounded text-red-600'>
-          {error}
+          {error.message}
         </div>
       )}
 
@@ -135,8 +118,8 @@ export function AuthForm({ type }: AuthFormProps) {
             )}
           />
 
-          <Button type='submit' className='w-full' disabled={loading}>
-            {loading
+          <Button type='submit' className='w-full' disabled={isPending}>
+            {isPending
               ? 'Loading...'
               : type === 'login'
                 ? 'Sign In'

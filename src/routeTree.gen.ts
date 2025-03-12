@@ -8,18 +8,60 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
+import { createFileRoute } from '@tanstack/react-router'
+
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as TestLoaderErrorImport } from './routes/test-loader-error'
+import { Route as TestErrorImport } from './routes/test-error'
+import { Route as TestAsyncErrorImport } from './routes/test-async-error'
+import { Route as OnboardingImport } from './routes/onboarding'
+import { Route as ErrorTestingImport } from './routes/error-testing'
 import { Route as AuthLayoutImport } from './routes/_authLayout'
 import { Route as DashboardRouteImport } from './routes/dashboard/route'
-import { Route as DashboardTransactionsImport } from './routes/dashboard/transactions'
-import { Route as DashboardSettingsImport } from './routes/dashboard/settings'
-import { Route as DashboardOverviewImport } from './routes/dashboard/overview'
 import { Route as AuthLayoutRegisterImport } from './routes/_authLayout/register'
 import { Route as AuthLayoutLoginImport } from './routes/_authLayout/login'
+import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings/route'
+import { Route as DashboardOverviewRouteImport } from './routes/dashboard/overview/route'
+
+// Create Virtual Routes
+
+const DashboardTransactionsRouteLazyImport = createFileRoute(
+  '/dashboard/transactions',
+)()
 
 // Create/Update Routes
+
+const TestLoaderErrorRoute = TestLoaderErrorImport.update({
+  id: '/test-loader-error',
+  path: '/test-loader-error',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const TestErrorRoute = TestErrorImport.update({
+  id: '/test-error',
+  path: '/test-error',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const TestAsyncErrorRoute = TestAsyncErrorImport.update({
+  id: '/test-async-error',
+  path: '/test-async-error',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const OnboardingRoute = OnboardingImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ErrorTestingRoute = ErrorTestingImport.update({
+  id: '/error-testing',
+  path: '/error-testing',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const AuthLayoutRoute = AuthLayoutImport.update({
   id: '/_authLayout',
@@ -32,23 +74,14 @@ const DashboardRouteRoute = DashboardRouteImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const DashboardTransactionsRoute = DashboardTransactionsImport.update({
-  id: '/transactions',
-  path: '/transactions',
-  getParentRoute: () => DashboardRouteRoute,
-} as any)
-
-const DashboardSettingsRoute = DashboardSettingsImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => DashboardRouteRoute,
-} as any)
-
-const DashboardOverviewRoute = DashboardOverviewImport.update({
-  id: '/overview',
-  path: '/overview',
-  getParentRoute: () => DashboardRouteRoute,
-} as any)
+const DashboardTransactionsRouteLazyRoute =
+  DashboardTransactionsRouteLazyImport.update({
+    id: '/transactions',
+    path: '/transactions',
+    getParentRoute: () => DashboardRouteRoute,
+  } as any).lazy(() =>
+    import('./routes/dashboard/transactions/route.lazy').then((d) => d.Route),
+  )
 
 const AuthLayoutRegisterRoute = AuthLayoutRegisterImport.update({
   id: '/register',
@@ -60,6 +93,18 @@ const AuthLayoutLoginRoute = AuthLayoutLoginImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => AuthLayoutRoute,
+} as any)
+
+const DashboardSettingsRouteRoute = DashboardSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+
+const DashboardOverviewRouteRoute = DashboardOverviewRouteImport.update({
+  id: '/overview',
+  path: '/overview',
+  getParentRoute: () => DashboardRouteRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -80,6 +125,55 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLayoutImport
       parentRoute: typeof rootRoute
     }
+    '/error-testing': {
+      id: '/error-testing'
+      path: '/error-testing'
+      fullPath: '/error-testing'
+      preLoaderRoute: typeof ErrorTestingImport
+      parentRoute: typeof rootRoute
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingImport
+      parentRoute: typeof rootRoute
+    }
+    '/test-async-error': {
+      id: '/test-async-error'
+      path: '/test-async-error'
+      fullPath: '/test-async-error'
+      preLoaderRoute: typeof TestAsyncErrorImport
+      parentRoute: typeof rootRoute
+    }
+    '/test-error': {
+      id: '/test-error'
+      path: '/test-error'
+      fullPath: '/test-error'
+      preLoaderRoute: typeof TestErrorImport
+      parentRoute: typeof rootRoute
+    }
+    '/test-loader-error': {
+      id: '/test-loader-error'
+      path: '/test-loader-error'
+      fullPath: '/test-loader-error'
+      preLoaderRoute: typeof TestLoaderErrorImport
+      parentRoute: typeof rootRoute
+    }
+    '/dashboard/overview': {
+      id: '/dashboard/overview'
+      path: '/overview'
+      fullPath: '/dashboard/overview'
+      preLoaderRoute: typeof DashboardOverviewRouteImport
+      parentRoute: typeof DashboardRouteImport
+    }
+    '/dashboard/settings': {
+      id: '/dashboard/settings'
+      path: '/settings'
+      fullPath: '/dashboard/settings'
+      preLoaderRoute: typeof DashboardSettingsRouteImport
+      parentRoute: typeof DashboardRouteImport
+    }
     '/_authLayout/login': {
       id: '/_authLayout/login'
       path: '/login'
@@ -94,25 +188,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLayoutRegisterImport
       parentRoute: typeof AuthLayoutImport
     }
-    '/dashboard/overview': {
-      id: '/dashboard/overview'
-      path: '/overview'
-      fullPath: '/dashboard/overview'
-      preLoaderRoute: typeof DashboardOverviewImport
-      parentRoute: typeof DashboardRouteImport
-    }
-    '/dashboard/settings': {
-      id: '/dashboard/settings'
-      path: '/settings'
-      fullPath: '/dashboard/settings'
-      preLoaderRoute: typeof DashboardSettingsImport
-      parentRoute: typeof DashboardRouteImport
-    }
     '/dashboard/transactions': {
       id: '/dashboard/transactions'
       path: '/transactions'
       fullPath: '/dashboard/transactions'
-      preLoaderRoute: typeof DashboardTransactionsImport
+      preLoaderRoute: typeof DashboardTransactionsRouteLazyImport
       parentRoute: typeof DashboardRouteImport
     }
   }
@@ -121,15 +201,15 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 interface DashboardRouteRouteChildren {
-  DashboardOverviewRoute: typeof DashboardOverviewRoute
-  DashboardSettingsRoute: typeof DashboardSettingsRoute
-  DashboardTransactionsRoute: typeof DashboardTransactionsRoute
+  DashboardOverviewRouteRoute: typeof DashboardOverviewRouteRoute
+  DashboardSettingsRouteRoute: typeof DashboardSettingsRouteRoute
+  DashboardTransactionsRouteLazyRoute: typeof DashboardTransactionsRouteLazyRoute
 }
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
-  DashboardOverviewRoute: DashboardOverviewRoute,
-  DashboardSettingsRoute: DashboardSettingsRoute,
-  DashboardTransactionsRoute: DashboardTransactionsRoute,
+  DashboardOverviewRouteRoute: DashboardOverviewRouteRoute,
+  DashboardSettingsRouteRoute: DashboardSettingsRouteRoute,
+  DashboardTransactionsRouteLazyRoute: DashboardTransactionsRouteLazyRoute,
 }
 
 const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
@@ -153,32 +233,47 @@ const AuthLayoutRouteWithChildren = AuthLayoutRoute._addFileChildren(
 export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRouteRouteWithChildren
   '': typeof AuthLayoutRouteWithChildren
+  '/error-testing': typeof ErrorTestingRoute
+  '/onboarding': typeof OnboardingRoute
+  '/test-async-error': typeof TestAsyncErrorRoute
+  '/test-error': typeof TestErrorRoute
+  '/test-loader-error': typeof TestLoaderErrorRoute
+  '/dashboard/overview': typeof DashboardOverviewRouteRoute
+  '/dashboard/settings': typeof DashboardSettingsRouteRoute
   '/login': typeof AuthLayoutLoginRoute
   '/register': typeof AuthLayoutRegisterRoute
-  '/dashboard/overview': typeof DashboardOverviewRoute
-  '/dashboard/settings': typeof DashboardSettingsRoute
-  '/dashboard/transactions': typeof DashboardTransactionsRoute
+  '/dashboard/transactions': typeof DashboardTransactionsRouteLazyRoute
 }
 
 export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRouteRouteWithChildren
   '': typeof AuthLayoutRouteWithChildren
+  '/error-testing': typeof ErrorTestingRoute
+  '/onboarding': typeof OnboardingRoute
+  '/test-async-error': typeof TestAsyncErrorRoute
+  '/test-error': typeof TestErrorRoute
+  '/test-loader-error': typeof TestLoaderErrorRoute
+  '/dashboard/overview': typeof DashboardOverviewRouteRoute
+  '/dashboard/settings': typeof DashboardSettingsRouteRoute
   '/login': typeof AuthLayoutLoginRoute
   '/register': typeof AuthLayoutRegisterRoute
-  '/dashboard/overview': typeof DashboardOverviewRoute
-  '/dashboard/settings': typeof DashboardSettingsRoute
-  '/dashboard/transactions': typeof DashboardTransactionsRoute
+  '/dashboard/transactions': typeof DashboardTransactionsRouteLazyRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/dashboard': typeof DashboardRouteRouteWithChildren
   '/_authLayout': typeof AuthLayoutRouteWithChildren
+  '/error-testing': typeof ErrorTestingRoute
+  '/onboarding': typeof OnboardingRoute
+  '/test-async-error': typeof TestAsyncErrorRoute
+  '/test-error': typeof TestErrorRoute
+  '/test-loader-error': typeof TestLoaderErrorRoute
+  '/dashboard/overview': typeof DashboardOverviewRouteRoute
+  '/dashboard/settings': typeof DashboardSettingsRouteRoute
   '/_authLayout/login': typeof AuthLayoutLoginRoute
   '/_authLayout/register': typeof AuthLayoutRegisterRoute
-  '/dashboard/overview': typeof DashboardOverviewRoute
-  '/dashboard/settings': typeof DashboardSettingsRoute
-  '/dashboard/transactions': typeof DashboardTransactionsRoute
+  '/dashboard/transactions': typeof DashboardTransactionsRouteLazyRoute
 }
 
 export interface FileRouteTypes {
@@ -186,28 +281,43 @@ export interface FileRouteTypes {
   fullPaths:
     | '/dashboard'
     | ''
-    | '/login'
-    | '/register'
+    | '/error-testing'
+    | '/onboarding'
+    | '/test-async-error'
+    | '/test-error'
+    | '/test-loader-error'
     | '/dashboard/overview'
     | '/dashboard/settings'
+    | '/login'
+    | '/register'
     | '/dashboard/transactions'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/dashboard'
     | ''
-    | '/login'
-    | '/register'
+    | '/error-testing'
+    | '/onboarding'
+    | '/test-async-error'
+    | '/test-error'
+    | '/test-loader-error'
     | '/dashboard/overview'
     | '/dashboard/settings'
+    | '/login'
+    | '/register'
     | '/dashboard/transactions'
   id:
     | '__root__'
     | '/dashboard'
     | '/_authLayout'
-    | '/_authLayout/login'
-    | '/_authLayout/register'
+    | '/error-testing'
+    | '/onboarding'
+    | '/test-async-error'
+    | '/test-error'
+    | '/test-loader-error'
     | '/dashboard/overview'
     | '/dashboard/settings'
+    | '/_authLayout/login'
+    | '/_authLayout/register'
     | '/dashboard/transactions'
   fileRoutesById: FileRoutesById
 }
@@ -215,11 +325,21 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
   AuthLayoutRoute: typeof AuthLayoutRouteWithChildren
+  ErrorTestingRoute: typeof ErrorTestingRoute
+  OnboardingRoute: typeof OnboardingRoute
+  TestAsyncErrorRoute: typeof TestAsyncErrorRoute
+  TestErrorRoute: typeof TestErrorRoute
+  TestLoaderErrorRoute: typeof TestLoaderErrorRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
   AuthLayoutRoute: AuthLayoutRouteWithChildren,
+  ErrorTestingRoute: ErrorTestingRoute,
+  OnboardingRoute: OnboardingRoute,
+  TestAsyncErrorRoute: TestAsyncErrorRoute,
+  TestErrorRoute: TestErrorRoute,
+  TestLoaderErrorRoute: TestLoaderErrorRoute,
 }
 
 export const routeTree = rootRoute
@@ -233,7 +353,12 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/dashboard",
-        "/_authLayout"
+        "/_authLayout",
+        "/error-testing",
+        "/onboarding",
+        "/test-async-error",
+        "/test-error",
+        "/test-loader-error"
       ]
     },
     "/dashboard": {
@@ -251,6 +376,29 @@ export const routeTree = rootRoute
         "/_authLayout/register"
       ]
     },
+    "/error-testing": {
+      "filePath": "error-testing.tsx"
+    },
+    "/onboarding": {
+      "filePath": "onboarding.tsx"
+    },
+    "/test-async-error": {
+      "filePath": "test-async-error.tsx"
+    },
+    "/test-error": {
+      "filePath": "test-error.tsx"
+    },
+    "/test-loader-error": {
+      "filePath": "test-loader-error.tsx"
+    },
+    "/dashboard/overview": {
+      "filePath": "dashboard/overview/route.tsx",
+      "parent": "/dashboard"
+    },
+    "/dashboard/settings": {
+      "filePath": "dashboard/settings/route.tsx",
+      "parent": "/dashboard"
+    },
     "/_authLayout/login": {
       "filePath": "_authLayout/login.tsx",
       "parent": "/_authLayout"
@@ -259,16 +407,8 @@ export const routeTree = rootRoute
       "filePath": "_authLayout/register.tsx",
       "parent": "/_authLayout"
     },
-    "/dashboard/overview": {
-      "filePath": "dashboard/overview.tsx",
-      "parent": "/dashboard"
-    },
-    "/dashboard/settings": {
-      "filePath": "dashboard/settings.tsx",
-      "parent": "/dashboard"
-    },
     "/dashboard/transactions": {
-      "filePath": "dashboard/transactions.tsx",
+      "filePath": "dashboard/transactions/route.lazy.tsx",
       "parent": "/dashboard"
     }
   }

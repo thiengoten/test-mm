@@ -1,10 +1,10 @@
+import { DefaultCatchBoundary, NotFound } from '@/components/common'
 import { ThemeProvider } from '@/providers'
+import { DialogProvider } from '@/providers/dialog-provider'
+import type { QueryClient } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/router-devtools'
-
-import { DialogProvider } from '@/providers/dialog-provider'
-import type { QueryClient } from '@tanstack/react-query'
 export interface MyRouterContext {
   queryClient: QueryClient
 }
@@ -20,5 +20,6 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       <ReactQueryDevtools buttonPosition='top-right' />
     </ThemeProvider>
   ),
-  errorComponent: () => <div>Error</div>,
+  errorComponent: (props) => <DefaultCatchBoundary {...props} />,
+  notFoundComponent: () => <NotFound />,
 })
