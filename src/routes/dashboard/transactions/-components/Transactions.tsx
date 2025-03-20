@@ -137,6 +137,7 @@ export function Transactions() {
       title: 'Add Transaction',
       description: 'Add a new transaction to your account',
       content: <TransactionForm />,
+      size: 'xl',
     })
   }
   // Initialize the edit form

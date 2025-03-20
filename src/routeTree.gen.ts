@@ -20,6 +20,7 @@ import { Route as OnboardingImport } from './routes/onboarding'
 import { Route as ErrorTestingImport } from './routes/error-testing'
 import { Route as AuthLayoutImport } from './routes/_authLayout'
 import { Route as DashboardRouteImport } from './routes/dashboard/route'
+import { Route as DashboardIndexImport } from './routes/dashboard/index'
 import { Route as AuthLayoutRegisterImport } from './routes/_authLayout/register'
 import { Route as AuthLayoutLoginImport } from './routes/_authLayout/login'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings/route'
@@ -27,6 +28,7 @@ import { Route as DashboardOverviewRouteImport } from './routes/dashboard/overvi
 
 // Create Virtual Routes
 
+const TestComponentIndexLazyImport = createFileRoute('/test-component/')()
 const DashboardTransactionsRouteLazyImport = createFileRoute(
   '/dashboard/transactions',
 )()
@@ -72,6 +74,20 @@ const DashboardRouteRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => rootRoute,
+} as any)
+
+const TestComponentIndexLazyRoute = TestComponentIndexLazyImport.update({
+  id: '/test-component/',
+  path: '/test-component/',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() =>
+  import('./routes/test-component/index.lazy').then((d) => d.Route),
+)
+
+const DashboardIndexRoute = DashboardIndexImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardRouteRoute,
 } as any)
 
 const DashboardTransactionsRouteLazyRoute =
@@ -195,6 +211,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardTransactionsRouteLazyImport
       parentRoute: typeof DashboardRouteImport
     }
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardIndexImport
+      parentRoute: typeof DashboardRouteImport
+    }
+    '/test-component/': {
+      id: '/test-component/'
+      path: '/test-component'
+      fullPath: '/test-component'
+      preLoaderRoute: typeof TestComponentIndexLazyImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -204,12 +234,14 @@ interface DashboardRouteRouteChildren {
   DashboardOverviewRouteRoute: typeof DashboardOverviewRouteRoute
   DashboardSettingsRouteRoute: typeof DashboardSettingsRouteRoute
   DashboardTransactionsRouteLazyRoute: typeof DashboardTransactionsRouteLazyRoute
+  DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardOverviewRouteRoute: DashboardOverviewRouteRoute,
   DashboardSettingsRouteRoute: DashboardSettingsRouteRoute,
   DashboardTransactionsRouteLazyRoute: DashboardTransactionsRouteLazyRoute,
+  DashboardIndexRoute: DashboardIndexRoute,
 }
 
 const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
@@ -243,10 +275,11 @@ export interface FileRoutesByFullPath {
   '/login': typeof AuthLayoutLoginRoute
   '/register': typeof AuthLayoutRegisterRoute
   '/dashboard/transactions': typeof DashboardTransactionsRouteLazyRoute
+  '/dashboard/': typeof DashboardIndexRoute
+  '/test-component': typeof TestComponentIndexLazyRoute
 }
 
 export interface FileRoutesByTo {
-  '/dashboard': typeof DashboardRouteRouteWithChildren
   '': typeof AuthLayoutRouteWithChildren
   '/error-testing': typeof ErrorTestingRoute
   '/onboarding': typeof OnboardingRoute
@@ -258,6 +291,8 @@ export interface FileRoutesByTo {
   '/login': typeof AuthLayoutLoginRoute
   '/register': typeof AuthLayoutRegisterRoute
   '/dashboard/transactions': typeof DashboardTransactionsRouteLazyRoute
+  '/dashboard': typeof DashboardIndexRoute
+  '/test-component': typeof TestComponentIndexLazyRoute
 }
 
 export interface FileRoutesById {
@@ -274,6 +309,8 @@ export interface FileRoutesById {
   '/_authLayout/login': typeof AuthLayoutLoginRoute
   '/_authLayout/register': typeof AuthLayoutRegisterRoute
   '/dashboard/transactions': typeof DashboardTransactionsRouteLazyRoute
+  '/dashboard/': typeof DashboardIndexRoute
+  '/test-component/': typeof TestComponentIndexLazyRoute
 }
 
 export interface FileRouteTypes {
@@ -291,9 +328,10 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/dashboard/transactions'
+    | '/dashboard/'
+    | '/test-component'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/dashboard'
     | ''
     | '/error-testing'
     | '/onboarding'
@@ -305,6 +343,8 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/dashboard/transactions'
+    | '/dashboard'
+    | '/test-component'
   id:
     | '__root__'
     | '/dashboard'
@@ -319,6 +359,8 @@ export interface FileRouteTypes {
     | '/_authLayout/login'
     | '/_authLayout/register'
     | '/dashboard/transactions'
+    | '/dashboard/'
+    | '/test-component/'
   fileRoutesById: FileRoutesById
 }
 
@@ -330,6 +372,7 @@ export interface RootRouteChildren {
   TestAsyncErrorRoute: typeof TestAsyncErrorRoute
   TestErrorRoute: typeof TestErrorRoute
   TestLoaderErrorRoute: typeof TestLoaderErrorRoute
+  TestComponentIndexLazyRoute: typeof TestComponentIndexLazyRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -340,6 +383,7 @@ const rootRouteChildren: RootRouteChildren = {
   TestAsyncErrorRoute: TestAsyncErrorRoute,
   TestErrorRoute: TestErrorRoute,
   TestLoaderErrorRoute: TestLoaderErrorRoute,
+  TestComponentIndexLazyRoute: TestComponentIndexLazyRoute,
 }
 
 export const routeTree = rootRoute
@@ -358,7 +402,8 @@ export const routeTree = rootRoute
         "/onboarding",
         "/test-async-error",
         "/test-error",
-        "/test-loader-error"
+        "/test-loader-error",
+        "/test-component/"
       ]
     },
     "/dashboard": {
@@ -366,7 +411,8 @@ export const routeTree = rootRoute
       "children": [
         "/dashboard/overview",
         "/dashboard/settings",
-        "/dashboard/transactions"
+        "/dashboard/transactions",
+        "/dashboard/"
       ]
     },
     "/_authLayout": {
@@ -410,6 +456,13 @@ export const routeTree = rootRoute
     "/dashboard/transactions": {
       "filePath": "dashboard/transactions/route.lazy.tsx",
       "parent": "/dashboard"
+    },
+    "/dashboard/": {
+      "filePath": "dashboard/index.tsx",
+      "parent": "/dashboard"
+    },
+    "/test-component/": {
+      "filePath": "test-component/index.lazy.tsx"
     }
   }
 }

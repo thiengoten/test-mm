@@ -58,6 +58,7 @@ export function AuthForm({ type }: AuthFormProps) {
     if (type === 'login') {
       onLogin(data)
     } else {
+      console.log('🚀 ~ onSubmit ~ data:', data)
       onSignUp(data)
     }
   }

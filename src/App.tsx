@@ -1,34 +1,49 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { getItems } from '@/api/test-api'
+import { useInfiniteQuery } from '@tanstack/react-query'
+import { useEffect } from 'react'
+import { useInView } from 'react-intersection-observer'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const { data, error, status, fetchNextPage, isFetchingNextPage } =
+    useInfiniteQuery({
+      queryKey: ['items'],
+      queryFn: getItems,
+      initialPageParam: 0,
+      getNextPageParam: (lastPage) => lastPage.nextPage,
+    })
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+  console.log('🚀 ~ App ~ data:', data)
+  const { ref, inView } = useInView()
+
+  useEffect(() => {
+    if (inView) {
+      fetchNextPage()
+    }
+  }, [fetchNextPage, inView])
+
+  return status === 'pending' ? (
+    <div>Loading...</div>
+  ) : status === 'error' ? (
+    <div>{error.message}</div>
+  ) : (
+    <div className='flex flex-col gap-2'>
+      {data.pages.map((page) => {
+        return (
+          <div key={page.currentPage} className='flex flex-col gap-2'>
+            {page.data.map((item) => {
+              return (
+                <div key={item.id} className='rounded-md bg-grayscale-700 p-4'>
+                  {item.name}
+                </div>
+              )
+            })}
+          </div>
+        )
+      })}
+
+      <div ref={ref}>{isFetchingNextPage && 'Loading...'}</div>
+    </div>
   )
 }
 

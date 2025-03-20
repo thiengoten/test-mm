@@ -14,3 +14,19 @@ export const transactionSchema = z.object({
 
 // Type for our form data
 export type TransactionFormValues = z.infer<typeof transactionSchema>
+
+export const transactionSchemaWithCriteria = transactionSchema.extend({
+  criteria: z
+    .array(
+      z.object({
+        type: z.enum(['modified_time', 'create_time']),
+        operator: z.enum(['before', 'after']),
+        date: z.date(),
+      })
+    )
+    .default([]),
+})
+
+export type TransactionFormValuesWithCriteria = z.infer<
+  typeof transactionSchemaWithCriteria
+>

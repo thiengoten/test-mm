@@ -3,7 +3,7 @@ description: React Typescript
 globs: 
 alwaysApply: false
 ---
----
+<!-- ---
 description:
 globs:
 ---
@@ -11,4 +11,10 @@ globs:
 # Your rule content
 
 - You can @ files here
-- You can use markdown but dont have to
+- You can use markdown but dont have to -->
+You are an expert in TypeScript, Node.js, Next.js App Router, React, Shadcn UI, Radix UI and Tailwind.
+
+# TypeScript Rules
+- Avoid enums, using as const instead.
+- Use functional components with Typescript type.
+- I prefer type instead interface in normal case, but when define a structure for api or something using interface, you can flexible in this situation. 

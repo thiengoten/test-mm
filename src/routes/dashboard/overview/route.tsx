@@ -9,13 +9,30 @@ import {
 
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
-import { createFileRoute } from '@tanstack/react-router'
+import useAuthStore from '@/store/useAuthStore'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { toast } from 'sonner'
 
 export const Route = createFileRoute('/dashboard/overview')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+  const navigate = useNavigate()
+
+  if (!isAuthenticated) {
+    toast.error('You are not authenticated', {
+      description: 'Please login to continue',
+      action: {
+        label: 'Login',
+        onClick: () => {
+          navigate({ to: '/login' })
+        },
+      },
+    })
+  }
+
   return (
     <>
       <header className='flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12'>

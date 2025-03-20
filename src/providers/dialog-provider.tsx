@@ -31,6 +31,7 @@ type BaseDialogOptions = {
 type ContentDialogOptions = BaseDialogOptions & {
   type: DialogTypes.CONTENT_DIALOG
   content?: React.ReactNode
+  size?: DialogSize
 }
 
 type AlertDialogOptions = BaseDialogOptions & {
@@ -40,6 +41,15 @@ type AlertDialogOptions = BaseDialogOptions & {
   cancelText?: string
   onOk?: () => void
   onCancel?: () => void
+  size?: DialogSize
+}
+type DialogSize = 'sm' | 'md' | 'lg' | 'xl'
+
+const dialogSizeMap: Record<DialogSize, string> = {
+  sm: 'sm:max-w-sm',
+  md: 'sm:max-w-md',
+  lg: 'sm:max-w-lg',
+  xl: 'sm:max-w-xl',
 }
 
 type DialogOptions = ContentDialogOptions | AlertDialogOptions
@@ -97,7 +107,13 @@ export const DialogProvider: React.FC<React.PropsWithChildren> = ({
             currentDialog === latestContentDialog ? closeDialog : undefined
           }
         >
-          <DialogContent>
+          <DialogContent
+            className={
+              latestContentDialog.size
+                ? dialogSizeMap[latestContentDialog.size]
+                : ''
+            }
+          >
             {latestContentDialog.title && (
               <DialogHeader>
                 <DialogTitle>{latestContentDialog.title}</DialogTitle>
