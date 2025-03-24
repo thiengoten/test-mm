@@ -27,11 +27,13 @@ type Criterion = {
 type SelectConditionsDateProps = {
   onChange?: (criteria: Omit<Criterion, 'id'>[]) => void
   defaultCriteria?: Omit<Criterion, 'id'>[]
+  selectType?: 'file' | 'folder' | 'duplicate'
 }
 
 const SelectConditionsDate = ({
   onChange,
   defaultCriteria,
+  selectType,
 }: SelectConditionsDateProps = {}) => {
   const [criteria, setCriteria] = useState<Criterion[]>(
     defaultCriteria?.map((c) => ({ ...c, id: uuidv4() })) || [
