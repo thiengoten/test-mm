@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Plus, Trash2 } from 'lucide-react'
-import { useEffect } from 'react'
+import { forwardRef, useEffect, useImperativeHandle } from 'react'
 import { useForm } from 'react-hook-form'
 
 type SelectWithConditonsProps = {
@@ -32,7 +32,16 @@ type FormValues = {
   logicalOperators: LogicalOperator[]
 }
 
-const SelectWithConditons = ({ selectMethod }: SelectWithConditonsProps) => {
+export type SelectWithConditionsRef = {
+  getLogicalOperators: () => LogicalOperator[]
+  getCriteria: () => CriterionType[]
+  getLogicalExpression: () => string
+}
+
+const SelectWithConditons = forwardRef<
+  SelectWithConditionsRef,
+  SelectWithConditonsProps
+>(({ selectMethod }, ref) => {
   // Setup form with basic structure
   const form = useForm<FormValues>({
     defaultValues: {
@@ -246,6 +255,12 @@ const SelectWithConditons = ({ selectMethod }: SelectWithConditonsProps) => {
   const criteria = form.watch('criteria')
   const logicalOperators = form.watch('logicalOperators')
 
+  useImperativeHandle(ref, () => ({
+    getLogicalOperators: () => logicalOperators,
+    getCriteria: () => criteria,
+    getLogicalExpression: () => generateLogicalExpression(),
+  }))
+
   return (
     <div className='space-y-4'>
       <Form {...form}>
@@ -415,6 +430,6 @@ const SelectWithConditons = ({ selectMethod }: SelectWithConditonsProps) => {
       </Form>
     </div>
   )
-}
+})
 
 export default SelectWithConditons
